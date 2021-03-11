@@ -143,7 +143,7 @@ app.post("/api/exercise/add", async (req, res) => {
       (value) => {
         res.json({
           _id: userId,
-          username: value.username,
+          username: findUser.username,
           date: dateFormat.toDateString(),
           duration,
           description,
