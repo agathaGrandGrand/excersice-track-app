@@ -43,7 +43,6 @@ const exerciseSchema = new mongoose.Schema(
 const userSchema = new mongoose.Schema({
   _id: { type: String, default: shortid.generate() },
   username: { type: String, required: true },
-  count: Number,
   log: [
     {
       type: exerciseSchema,
