@@ -130,7 +130,7 @@ app.post("/api/exercise/add", async (req, res) => {
   //     }
   //   }
   // );
-
+  //SEVKksl5F
   const findUser = await users.findById(userId).catch((error) => {
     console.log(error);
   });
@@ -141,15 +141,15 @@ app.post("/api/exercise/add", async (req, res) => {
     addExercise(findUser, log).then(
       (value) => {
         res.json({
-          _id: userId,
           username: findUser.username,
-          date: dateFormat.toDateString(),
-          duration,
-          description,
+          _id: findUser._id,
+          duration: log.duration,
+          description: log.description,
+          date: log.date,
         });
       },
       (error) => {
-        keys = Object.keys(error.errors);
+        const keys = Object.keys(error.errors);
         res.send(error.errors[keys[0]].properties.message);
       }
     );
