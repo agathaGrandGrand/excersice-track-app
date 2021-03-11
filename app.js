@@ -3,8 +3,6 @@ const app = express();
 const mongoose = require("mongoose");
 const shortid = require("shortid");
 const bodyParser = require("body-parser");
-const e = require("express");
-const { ObjectId } = require("bson");
 const urlEncoded = bodyParser.urlencoded({ extended: false });
 const monthNames = [
   "Jan",
@@ -79,7 +77,7 @@ const addExercise = async (user, exercise) => {
   user = await user.save();
   return exercise;
 };
-//CtCEA9SAi
+//vP77rIcaV
 //*post create user
 app.use(urlEncoded);
 app.post("/api/exercise/new-user", async (req, res) => {
@@ -101,7 +99,7 @@ app.post("/api/exercise/new-user", async (req, res) => {
 });
 //*post exercise
 app.post("/api/exercise/add", async (req, res) => {
-  const { userId: _id, description, duration, date } = req.body;
+  const { userId, description, duration, date } = req.body;
   let dateFormat = date !== "" ? new Date(date) : new Date();
   /**const _id = req.body.userId;
   const description = req.body.description;
@@ -112,12 +110,12 @@ app.post("/api/exercise/add", async (req, res) => {
   // date = `${date.getUTCDate()}-${
   //   monthNames[date.getMonth()]
   // }-${date.getFullYear()} `;
-  const findUser = await users.findById(_id).catch((error) => {
+  const findUser = await users.findById(userId).catch((error) => {
     console.log(error);
   });
 
   if (!findUser) {
-    res.send(`User "${_id}" not found`);
+    res.send(`User "${userId}" not found`);
   } else {
     addExercise(findUser, log).then(
       (value) => {
@@ -134,6 +132,46 @@ app.post("/api/exercise/add", async (req, res) => {
 app.get("/api/exercise/users", async (req, res) => {
   const allUsers = await users.find();
   res.send(allUsers);
+});
+//log user
+app.get("/api/exercise/log", async (req, res) => {
+  const { userId, from, to, limit } = req.query;
+  if (!userId) {
+    res.send("/api/exercise/log?userId=[yourId] is required");
+    return;
+  }
+  let user = await users.findById(userId).catch((error) => {
+    console.log(error);
+  });
+  let log;
+  if (!user) {
+    res.send("user not found");
+  } else {
+    log = [...user.log];
+    if (from) {
+      let dateFrom = new Date(from);
+      log = log.filter((exercise) => exercise.date > dateFrom);
+    }
+    if (to) {
+      let dateTo = new Date(to);
+      log = log.filter((exercise) => exercise.date < dateTo);
+    }
+    if (limit === 0 || !limit) {
+      res.json({
+        _id: userId,
+        username: user.username,
+        count: log.length,
+        log: log,
+      });
+    } else {
+      res.json({
+        _id: userId,
+        username: user.username,
+        count: log.length,
+        log: log.slice(0, limit),
+      });
+    }
+  }
 });
 //*show all userlogs
 
