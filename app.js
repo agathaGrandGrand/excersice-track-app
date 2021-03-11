@@ -70,13 +70,13 @@ const createUser = async (username, _id) => {
   return { username, _id };
 };
 
-const addExercise = async (user, exercise) => {
-  let new_exercise = new exercises(exercise);
-  user.log.push(new_exercise);
-  user.count += 1;
-  user = await user.save();
-  return exercise;
-};
+// const addExercise = async (user, exercise) => {
+//   let new_exercise = new exercises(exercise);
+//   user.log.push(new_exercise);
+//   user.count += 1;
+//   user = await user.save();
+//   return exercise;
+// };
 //vP77rIcaV
 //*post create user
 app.use(urlEncoded);
@@ -98,7 +98,7 @@ app.post("/api/exercise/new-user", async (req, res) => {
   }
 });
 //*post exercise
-app.post("/api/exercise/add", async (req, res) => {
+app.post("/api/exercise/add", (req, res) => {
   const { userId, description, duration, date } = req.body;
   let dateFormat = date !== "" ? new Date(date) : new Date();
   /**const _id = req.body.userId;
@@ -106,33 +106,53 @@ app.post("/api/exercise/add", async (req, res) => {
   const duration = req.body.duration;
   let date = req.body.date !== "" ? new Date(req.body.date) : new Date(); */
   // let date = new Date(`${dateYear}-${dateMonth}-${dateDay}`) || new Date();
-  const log = { description, duration, date: dateFormat };
+  const log = new exercises({ description, duration, date: dateFormat });
   // date = `${date.getUTCDate()}-${
   //   monthNames[date.getMonth()]
   // }-${date.getFullYear()} `;
-  const findUser = await users.findById(userId).catch((error) => {
-    console.log(error);
-  });
 
-  if (!findUser) {
-    res.send(`User "${userId}" not found`);
-  } else {
-    addExercise(findUser, log).then(
-      (value) => {
+  users.findByIdAndUpdate(
+    userId,
+    { $push: { log: log } },
+    { new: true },
+    (err, data) => {
+      if (err) {
+        res.send(`${err}`);
+      } else {
         res.json({
           _id: userId,
-          username: findUser.username,
+          username: data.username,
           date: dateFormat,
           duration,
           description,
         });
-      },
-      (error) => {
-        keys = Object.keys(error.errors);
-        console.log(error.errors[keys[0]].properties.message);
       }
-    );
-  }
+    }
+  );
+
+  // const findUser = await users.findById(userId).catch((error) => {
+  //   console.log(error);
+  // });
+
+  // if (!findUser) {
+  //   res.send(`User "${userId}" not found`);
+  // } else {
+  //   addExercise(findUser, log).then(
+  //     (value) => {
+  //       res.json({
+  //         _id: userId,
+  //         username: findUser.username,
+  //         date: dateFormat,
+  //         duration,
+  //         description,
+  //       });
+  //     },
+  //     (error) => {
+  //       keys = Object.keys(error.errors);
+  //       console.log(error.errors[keys[0]].properties.message);
+  //     }
+  //   );
+  // }
 });
 //* show all users
 app.get("/api/exercise/users", async (req, res) => {
