@@ -126,5 +126,11 @@ app.post("/api/exercise/add", async (req, res) => {
     );
   }
 });
+//* show all users
+app.get("/api/exercise/users", async (req, res) => {
+  const allUsers = await users.find();
+  res.send(allUsers);
+});
+//*show all userlogs
 //*export module
 module.exports = app;
