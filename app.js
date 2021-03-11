@@ -101,13 +101,17 @@ app.post("/api/exercise/new-user", async (req, res) => {
 });
 //*post exercise
 app.post("/api/exercise/add", async (req, res) => {
-  const _id = req.body.userId;
+  const { userId: _id, description, duration, date } = req.body;
+  let dateFormat = date !== "" ? new Date(date) : new Date();
+  /**const _id = req.body.userId;
   const description = req.body.description;
   const duration = req.body.duration;
-  let date = req.body.date !== "" ? new Date(req.body.date) : new Date();
-  date = `${date.getUTCDate()}-${
-    monthNames[date.getMonth()]
-  }-${date.getFullYear()} `;
+  let date = req.body.date !== "" ? new Date(req.body.date) : new Date(); */
+  // let date = new Date(`${dateYear}-${dateMonth}-${dateDay}`) || new Date();
+  const log = { description, duration, date: dateFormat };
+  // date = `${date.getUTCDate()}-${
+  //   monthNames[date.getMonth()]
+  // }-${date.getFullYear()} `;
   const findUser = await users.findById(_id).catch((error) => {
     console.log(error);
   });
@@ -115,7 +119,7 @@ app.post("/api/exercise/add", async (req, res) => {
   if (!findUser) {
     res.send(`User "${_id}" not found`);
   } else {
-    addExercise(findUser, { description, duration, date }).then(
+    addExercise(findUser, log).then(
       (value) => {
         res.json(value);
       },
@@ -132,5 +136,6 @@ app.get("/api/exercise/users", async (req, res) => {
   res.send(allUsers);
 });
 //*show all userlogs
+
 //*export module
 module.exports = app;
