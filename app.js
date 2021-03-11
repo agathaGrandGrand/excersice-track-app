@@ -30,10 +30,9 @@ console.log("Connection Status : " + mongoose.connection.readyState);
 
 const exerciseSchema = new mongoose.Schema(
   {
-    description: { type: String, default: "", required: true },
+    description: { type: String, required: true },
     duration: {
       type: Number,
-      default: 0,
       required: true,
     },
     date: { type: Date, default: Date.now },
@@ -70,13 +69,13 @@ const createUser = async (username, _id) => {
   return { username, _id };
 };
 
-// const addExercise = async (user, exercise) => {
-//   let new_exercise = new exercises(exercise);
-//   user.log.push(new_exercise);
-//   user.count += 1;
-//   user = await user.save();
-//   return exercise;
-// };
+const addExercise = async (user, exercise) => {
+  let new_exercise = new exercises(exercise);
+  user.log.push(new_exercise);
+  user.count += 1;
+  user = await user.save();
+  return exercise;
+};
 //vP77rIcaV
 //*post create user
 app.use(urlEncoded);
@@ -98,65 +97,66 @@ app.post("/api/exercise/new-user", async (req, res) => {
   }
 });
 //*post exercise
-app.post("/api/exercise/add", (req, res) => {
+app.post("/api/exercise/add", async (req, res) => {
   const { userId, description, duration, date } = req.body;
+
   let dateFormat = date !== "" ? new Date(date) : new Date();
   /**const _id = req.body.userId;
   const description = req.body.description;
   const duration = req.body.duration;
   let date = req.body.date !== "" ? new Date(req.body.date) : new Date(); */
   // let date = new Date(`${dateYear}-${dateMonth}-${dateDay}`) || new Date();
-  const log = new exercises({
+  const log = {
     description,
     duration,
     date: dateFormat.toDateString(),
-  });
+  };
   // date = `${date.getUTCDate()}-${
   //   monthNames[date.getMonth()]
   // }-${date.getFullYear()} `;
 
-  users.findByIdAndUpdate(
-    userId,
-    { $push: { log: log } },
-    { new: true },
-    (err, data) => {
-      if (err) {
-        res.send(`${err}`);
-      } else {
+  // users.findByIdAndUpdate(
+  //   userId,
+  //   { $push: { log: log } },
+  //   { new: true },
+  //   (err, data) => {
+  //     if (err) {
+  //       res.send(error);
+  //     } else {
+  //       res.json({
+  //         _id: userId,
+  //         username: data.username,
+  //         date: dateFormat.toDateString(),
+  //         duration,
+  //         description,
+  //       });
+  //     }
+  //   }
+  // );
+
+  const findUser = await users.findById(userId).catch((error) => {
+    console.log(error);
+  });
+
+  if (!findUser) {
+    res.send(`User "${userId}" not found`);
+  } else {
+    addExercise(findUser, log).then(
+      (value) => {
         res.json({
           _id: userId,
-          username: data.username,
+          username: value.username,
           date: dateFormat.toDateString(),
           duration,
           description,
         });
+      },
+      (error) => {
+        keys = Object.keys(error.errors);
+        res.send(error.errors[keys[0]].properties.message);
       }
-    }
-  );
-
-  // const findUser = await users.findById(userId).catch((error) => {
-  //   console.log(error);
-  // });
-
-  // if (!findUser) {
-  //   res.send(`User "${userId}" not found`);
-  // } else {
-  //   addExercise(findUser, log).then(
-  //     (value) => {
-  //       res.json({
-  //         _id: userId,
-  //         username: findUser.username,
-  //         date: dateFormat,
-  //         duration,
-  //         description,
-  //       });
-  //     },
-  //     (error) => {
-  //       keys = Object.keys(error.errors);
-  //       console.log(error.errors[keys[0]].properties.message);
-  //     }
-  //   );
-  // }
+    );
+  }
 });
 //* show all users
 app.get("/api/exercise/users", async (req, res) => {
