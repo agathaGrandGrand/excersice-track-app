@@ -119,7 +119,13 @@ app.post("/api/exercise/add", async (req, res) => {
   } else {
     addExercise(findUser, log).then(
       (value) => {
-        res.json(findUser);
+        res.json({
+          _id: userId,
+          username: findUser.username,
+          date: dateFormat,
+          duration,
+          description,
+        });
       },
       (error) => {
         keys = Object.keys(error.errors);
