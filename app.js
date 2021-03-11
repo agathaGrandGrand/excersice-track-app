@@ -121,7 +121,7 @@ app.post("/api/exercise/add", async (req, res) => {
   } else {
     addExercise(findUser, log).then(
       (value) => {
-        res.json(value);
+        res.json(findUser);
       },
       (error) => {
         keys = Object.keys(error.errors);
