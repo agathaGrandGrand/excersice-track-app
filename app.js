@@ -97,7 +97,7 @@ app.post("/api/exercise/new-user", async (req, res) => {
 app.post("/api/exercise/add", async (req, res) => {
   const { userId, description, duration, date } = req.body;
 
-  let dateFormat = date !== "" ? new Date(date) : new Date();
+  let dateFormat = date !== "" ? new Date(date) : Date.now();
   /**const _id = req.body.userId;
   const description = req.body.description;
   const duration = req.body.duration;
@@ -105,7 +105,7 @@ app.post("/api/exercise/add", async (req, res) => {
   // let date = new Date(`${dateYear}-${dateMonth}-${dateDay}`) || new Date();
   const log = {
     description,
-    duration,
+    duration: parseInt(duration),
     date: dateFormat.toDateString(),
   };
   // date = `${date.getUTCDate()}-${
