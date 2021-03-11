@@ -106,7 +106,11 @@ app.post("/api/exercise/add", (req, res) => {
   const duration = req.body.duration;
   let date = req.body.date !== "" ? new Date(req.body.date) : new Date(); */
   // let date = new Date(`${dateYear}-${dateMonth}-${dateDay}`) || new Date();
-  const log = new exercises({ description, duration, date: dateFormat });
+  const log = new exercises({
+    description,
+    duration,
+    date: dateFormat.toDateString(),
+  });
   // date = `${date.getUTCDate()}-${
   //   monthNames[date.getMonth()]
   // }-${date.getFullYear()} `;
@@ -122,7 +126,7 @@ app.post("/api/exercise/add", (req, res) => {
         res.json({
           _id: userId,
           username: data.username,
-          date: dateFormat,
+          date: dateFormat.toDateString(),
           duration,
           description,
         });
