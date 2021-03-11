@@ -61,7 +61,6 @@ const createUser = async (username, _id) => {
   let new_user = new users({
     _id,
     username,
-    count: 0,
     log: [],
   });
 
@@ -72,11 +71,10 @@ const createUser = async (username, _id) => {
 const addExercise = async (user, exercise) => {
   let new_exercise = new exercises(exercise);
   user.log.push(new_exercise);
-  user.count += 1;
   user = await user.save();
   return exercise;
 };
-//vP77rIcaV
+//mA8E-9uQZ
 //*post create user
 app.use(urlEncoded);
 app.post("/api/exercise/new-user", async (req, res) => {
